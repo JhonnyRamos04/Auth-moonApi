@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "nombre": "Laptop Pro",
+        "precio": 1200.00,
+        "stock": 5
+    },
+    {
+        "id": 2,
+        "nombre": "Monitor Curvo 27",
+        "precio": 350.50,
+        "stock": 12
+    },
+    {
+        "id": 3,
+        "nombre": "Teclado Mecánico",
+        "precio": 85.00,
+        "stock": 20
+    }
+]
