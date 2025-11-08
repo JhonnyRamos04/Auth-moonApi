@@ -1,11 +1,9 @@
 <?php
-
 // Configuración de la Base de Datos
-define('DB_HOST', 'localhost'); // o la IP de tu servidor de BD
-define('DB_NAME', 'tu_base_de_datos');
-define('DB_USER', 'tu_usuario_de_bd');
-define('DB_PASS', 'tu_contraseña_de_bd');
+define('DB_HOST', '127.0.0.1');
+define('DB_NAME', 'moondb');     
+define('DB_USER', 'root');       
+define('DB_PASS', '');  
 
-// Clave secreta para firmar los JWT (JSON Web Tokens)
-// ¡CAMBIA ESTO POR UNA CADENA LARGA Y SEGURA!
-define('JWT_SECRET', 'tu_clave_secreta_super_larga_y_dificil_de_adivinar');
+// Clave secreta para JWT
+define('JWT_SECRET', 'mi_clave_super_secreta_2024_api_php');

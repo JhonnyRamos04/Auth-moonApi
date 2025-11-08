@@ -4,26 +4,21 @@ class Router
 {
     private $routes = [];
 
-    // Metodo para definir una ruta GET
     public function get($path, $controllerAction)
     {
         $this->addRoute('GET', $path, $controllerAction);
     }
 
-    // Metodo para definir una ruta POST
     public function post($path, $controllerAction)
     {
         $this->addRoute('POST', $path, $controllerAction);
     }
 
-    // Método privado para añadir rutas
     private function addRoute($method, $path, $controllerAction)
     {
         $this->routes[$method][$path] = $controllerAction;
     }
 
-
-    // Metodo para enrutar la peticion
     public function route($urlParts, $requestMethod)
     {
         // Construir la ruta a partir de los partes de la URL
@@ -34,6 +29,13 @@ class Router
             $path = '/';
         }
 
+        // DEPURACIÓN: Mostrar información de routing
+        echo "<!-- DEBUG Router:\n";
+        echo "Path: " . $path . "\n";
+        echo "Method: " . $requestMethod . "\n";
+        echo "Available routes: "; print_r($this->routes[$requestMethod] ?? []);
+        echo "-->";
+
         $routesForMethod = $this->routes[$requestMethod] ?? [];
 
         // 1) Coincidencia exacta
@@ -42,32 +44,46 @@ class Router
             return;
         }
 
-        // 2) Coincidencia con parámetros (ej: /products/123)
+        // 2) Coincidencia con parámetros (simplificada)
         foreach ($routesForMethod as $definedPath => $controllerAction) {
-            // Busca rutas que terminen en un patrón como '/{id}'
-            // Esta es una simplificación y podría mejorarse con expresiones regulares
-            if (strpos($definedPath, '{') !== false && strpos($path, rtrim(explode('{', $definedPath)[0], '/')) === 0) {
-                $pathParts = explode('/', trim($path, '/'));
-                $definedPathParts = explode('/', trim($definedPath, '/'));
-
-                if (count($pathParts) === count($definedPathParts)) {
-                    $params = [];
-                    // Extraer el valor del parámetro
-                    $idPart = end($pathParts);
-                    $this->dispatch($controllerAction, [$idPart]);
-                    return;
+            if (strpos($definedPath, '{') !== false) {
+                $basePath = rtrim(explode('{', $definedPath)[0], '/');
+                if (strpos($path, $basePath) === 0) {
+                    $pathParts = explode('/', trim($path, '/'));
+                    $definedPathParts = explode('/', trim($definedPath, '/'));
+                    
+                    if (count($pathParts) === count($definedPathParts)) {
+                        $param = end($pathParts);
+                        $this->dispatch($controllerAction, [$param]);
+                        return;
+                    }
                 }
             }
         }
 
         // No se encontró ruta
         header("HTTP/1.0 404 Not Found");
-        echo json_encode(['message' => 'Ruta no encontrada']);
+        echo json_encode([
+            'message' => 'Ruta no encontrada',
+            'debug' => [
+                'path' => $path,
+                'method' => $requestMethod,
+                'available_routes' => array_keys($routesForMethod)
+            ]
+        ]);
     }
 
     private function dispatch($controllerAction, $params = [])
     {
         list($controllerName, $action) = explode('@', $controllerAction);
+        
+        // DEPURACIÓN: Mostrar información del controlador
+        echo "<!-- DEBUG Dispatch:\n";
+        echo "Controller: " . $controllerName . "\n";
+        echo "Action: " . $action . "\n";
+        echo "Params: "; print_r($params);
+        echo "-->";
+        
         $controllerFile = __DIR__ . '/../Controllers/' . $controllerName . '.php';
 
         if (!file_exists($controllerFile)) {
@@ -77,8 +93,23 @@ class Router
         }
 
         require_once $controllerFile;
+        
+        // Verificar que la clase existe
+        if (!class_exists($controllerName)) {
+            header("HTTP/1.0 500 Internal Server Error");
+            echo json_encode(['message' => 'Clase no encontrada: ' . $controllerName]);
+            return;
+        }
+        
         $controller = new $controllerName();
-        // Llama al método del controlador, pasando los parámetros
+        
+        // Verificar que el método existe
+        if (!method_exists($controller, $action)) {
+            header("HTTP/1.0 500 Internal Server Error");
+            echo json_encode(['message' => 'Método no encontrado: ' . $action]);
+            return;
+        }
+        
         call_user_func_array([$controller, $action], $params);
     }
 }
