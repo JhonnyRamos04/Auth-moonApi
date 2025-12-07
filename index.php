@@ -22,7 +22,6 @@ $requestMethod = $_SERVER['REQUEST_METHOD'];
 if (isset($_SERVER['PATH_INFO'])) {
     $url = $_SERVER['PATH_INFO'];
 } else {
-    // Fallback: usar REQUEST_URI y eliminar query strings
     $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     // Eliminar el base path si es necesario
     $basePath = dirname($_SERVER['SCRIPT_NAME']);
@@ -33,7 +32,6 @@ if (isset($_SERVER['PATH_INFO'])) {
 
 $urlParts = explode('/', filter_var(trim($url, '/'), FILTER_SANITIZE_URL));
 
-// DEPURACIÓN: Mostrar información de la URL
 echo "<!-- DEBUG INFO:\n";
 echo "REQUEST_METHOD: " . $requestMethod . "\n";
 echo "REQUEST_URI: " . $_SERVER['REQUEST_URI'] . "\n";
