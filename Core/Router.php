@@ -29,13 +29,6 @@ class Router
             $path = '/';
         }
 
-        // DEPURACIÓN: Mostrar información de routing
-        echo "<!-- DEBUG Router:\n";
-        echo "Path: " . $path . "\n";
-        echo "Method: " . $requestMethod . "\n";
-        echo "Available routes: "; print_r($this->routes[$requestMethod] ?? []);
-        echo "-->";
-
         $routesForMethod = $this->routes[$requestMethod] ?? [];
 
         // 1) Coincidencia exacta
@@ -76,13 +69,6 @@ class Router
     private function dispatch($controllerAction, $params = [])
     {
         list($controllerName, $action) = explode('@', $controllerAction);
-        
-        // DEPURACIÓN: Mostrar información del controlador
-        echo "<!-- DEBUG Dispatch:\n";
-        echo "Controller: " . $controllerName . "\n";
-        echo "Action: " . $action . "\n";
-        echo "Params: "; print_r($params);
-        echo "-->";
         
         $controllerFile = __DIR__ . '/../Controllers/' . $controllerName . '.php';
 

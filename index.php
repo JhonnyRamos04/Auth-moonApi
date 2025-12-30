@@ -1,51 +1,36 @@
 <?php
-// Se establece la cabecera de la respuesta como json
-header("Content-Type: application/json;charset=UTF-8");
+// index.php
+
+// 1. Configuración de cabeceras
 header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// Manejar petición pre-flight de CORS
+// 2. Manejo de pre-flight (CORS)
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-// Incluir archivos necesarios
+// 3. Incluir archivos
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/Core/Router.php';
 
-// **CORRECCIÓN: Usar PATH_INFO en lugar de $_GET['url']**
+// 4. Lógica de Enrutamiento
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 
-// Obtener la URL desde PATH_INFO (funciona mejor con el servidor built-in de PHP)
-if (isset($_SERVER['PATH_INFO'])) {
-    $url = $_SERVER['PATH_INFO'];
-} else {
-    $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    // Eliminar el base path si es necesario
-    $basePath = dirname($_SERVER['SCRIPT_NAME']);
-    if ($basePath != '/' && strpos($url, $basePath) === 0) {
-        $url = substr($url, strlen($basePath));
-    }
-}
-
-$urlParts = explode('/', filter_var(trim($url, '/'), FILTER_SANITIZE_URL));
-
-echo "<!-- DEBUG INFO:\n";
-echo "REQUEST_METHOD: " . $requestMethod . "\n";
-echo "REQUEST_URI: " . $_SERVER['REQUEST_URI'] . "\n";
-echo "PATH_INFO: " . ($_SERVER['PATH_INFO'] ?? 'NOT SET') . "\n";
-echo "URL: " . $url . "\n";
-echo "URL Parts: "; print_r($urlParts);
-echo "-->";
+// Obtener la ruta limpia. 
+// Parseamos la URI para separar el path de los query params (?id=1)
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$urlParts = explode('/', filter_var(trim($uri, '/'), FILTER_SANITIZE_URL));
 
 // Instanciar el router
 $router = new Router();
 
-// --- Definir las rutas de la API de autenticación ---
+// --- Rutas ---
 $router->post('/register', 'AuthController@register');
 $router->post('/login', 'AuthController@login');
 
-// Ejecutar el enrutador
+// Ejecutar
 $router->route($urlParts, $requestMethod);
