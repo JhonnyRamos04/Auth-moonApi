@@ -29,24 +29,26 @@ class UserModel
 
 	/**
 	 * Crea un nuevo usuario en la base de datos.
-	 * @param string $username
+	 * @param string $full_name
 	 * @param string $email
 	 * @param string $password
 	 * @return bool True si se creó correctamente, false en caso contrario.
 	 */
-	public function create($username, $email, $password)
+	public function create($full_name, $email, $password)
 	{
 		// Hashear la contraseña antes de guardarla por seguridad
 		$hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+		$defaultRole = 1;
 
 		try {
 			$stmt = $this->db->prepare(
-				"INSERT INTO users (username, email, password) VALUES (:username, :email, :password)"
+				"INSERT INTO users (full_name, email, password, role_id) VALUES (:full_name, :email, :password, :role_id)"
 			);
 			$stmt->execute([
-				':username' => $username,
+				':full_name' => $full_name,
 				':email' => $email,
-				':password' => $hashedPassword
+				':password' => $hashedPassword,
+				':role_id' => $defaultRole
 			]);
 			return $stmt->rowCount() > 0;
 		} catch (PDOException $e) {

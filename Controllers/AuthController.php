@@ -19,7 +19,7 @@ class AuthController
         $data = json_decode(file_get_contents("php://input"));
 
         // Validaciones básicas
-        if (!isset($data->username) || !isset($data->email) || !isset($data->password)) {
+        if (!isset($data->full_name) || !isset($data->email) || !isset($data->password)) {
             header("HTTP/1.1 400 Bad Request");
             echo json_encode(['message' => 'Faltan datos requeridos.']);
             return;
@@ -38,7 +38,7 @@ class AuthController
         }
 
         // Intentar crear el usuario
-        if ($this->userModel->create($data->username, $data->email, $data->password)) {
+        if ($this->userModel->create($data->full_name, $data->email, $data->password)) {
             header("HTTP/1.1 201 Created");
             echo json_encode(['message' => 'Usuario creado exitosamente.']);
         } else {
@@ -71,7 +71,7 @@ class AuthController
                 'message' => 'Inicio de sesión exitoso.',
                 'user' => [
                     'id' => $user['id'],
-                    'username' => $user['username'],
+                    'full_name' => $user['full_name'],
                     'email' => $user['email']
                 ],
                 'token' => 'AQUI_VA_UN_JWT_GENERADO' // Placeholder
