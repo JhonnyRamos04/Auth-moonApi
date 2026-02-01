@@ -14,6 +14,11 @@ class Router
         $this->addRoute('POST', $path, $controllerAction);
     }
 
+    public function delete($path, $controllerAction)
+    {
+        $this->addRoute('DELETE', $path, $controllerAction);
+    }
+
     private function addRoute($method, $path, $controllerAction)
     {
         $this->routes[$method][$path] = $controllerAction;
@@ -44,7 +49,7 @@ class Router
                 if (strpos($path, $basePath) === 0) {
                     $pathParts = explode('/', trim($path, '/'));
                     $definedPathParts = explode('/', trim($definedPath, '/'));
-                    
+
                     if (count($pathParts) === count($definedPathParts)) {
                         $param = end($pathParts);
                         $this->dispatch($controllerAction, [$param]);
@@ -69,7 +74,7 @@ class Router
     private function dispatch($controllerAction, $params = [])
     {
         list($controllerName, $action) = explode('@', $controllerAction);
-        
+
         $controllerFile = __DIR__ . '/../Controllers/' . $controllerName . '.php';
 
         if (!file_exists($controllerFile)) {
@@ -79,23 +84,23 @@ class Router
         }
 
         require_once $controllerFile;
-        
+
         // Verificar que la clase existe
         if (!class_exists($controllerName)) {
             header("HTTP/1.0 500 Internal Server Error");
             echo json_encode(['message' => 'Clase no encontrada: ' . $controllerName]);
             return;
         }
-        
+
         $controller = new $controllerName();
-        
+
         // Verificar que el método existe
         if (!method_exists($controller, $action)) {
             header("HTTP/1.0 500 Internal Server Error");
             echo json_encode(['message' => 'Método no encontrado: ' . $action]);
             return;
         }
-        
+
         call_user_func_array([$controller, $action], $params);
     }
 }

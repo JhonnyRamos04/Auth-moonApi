@@ -31,6 +31,9 @@ $router = new Router();
 // --- Rutas ---
 $router->post('/register', 'AuthController@register');
 $router->post('/login', 'AuthController@login');
+$router->get('/get_users', 'AuthController@getUsers');
+$router->delete('/delete_user', 'AuthController@deleteUser');
+$router->post('/change_password', 'AuthController@changePassword');
 
 // Ejecutar
 $router->route($urlParts, $requestMethod);
