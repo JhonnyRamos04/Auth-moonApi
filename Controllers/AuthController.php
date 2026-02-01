@@ -70,7 +70,7 @@ class AuthController
             echo json_encode([
                 'message' => 'Inicio de sesión exitoso.',
                 'user' => [
-                    'id' => $user['id'],
+                    'id' => $user['user_id'],
                     'full_name' => $user['full_name'],
                     'email' => $user['email']
                 ],
